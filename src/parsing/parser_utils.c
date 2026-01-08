@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/19 00:00:00 by badr              #+#    #+#             */
-/*   Updated: 2025/12/19 16:18:42 by badr             ###   ########.fr       */
+/*   Created: 2025/12/19 15:19:33 by badr              #+#    #+#             */
+/*   Updated: 2026/01/08 16:15:03 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,13 @@
 int	is_redir_token(t_token_type type)
 {
 	return (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT
-		|| type == TOKEN_APPEND);
+		|| type == TOKEN_APPEND || type == TOKEN_HEREDOC);
 }
 
 /*
 ** Convertit un type de token en type de redirection correspondant
-** Mapping: TOKEN_REDIR_IN -> REDIR_IN, TOKEN_REDIR_OUT -> REDIR_OUT, TOKEN_APPEND -> REDIR_APPEND
+** TOKEN_REDIR_IN -> REDIR_IN, TOKEN_REDIR_OUT -> REDIR_OUT
+** TOKEN_APPEND -> REDIR_APPEND, TOKEN_HEREDOC -> REDIR_HEREDOC
 */
 t_redir_type	token_to_redir_type(t_token_type type)
 {
@@ -32,6 +33,8 @@ t_redir_type	token_to_redir_type(t_token_type type)
 		return (REDIR_IN);
 	else if (type == TOKEN_REDIR_OUT)
 		return (REDIR_OUT);
+	else if (type == TOKEN_HEREDOC)
+		return (REDIR_HEREDOC);
 	else
 		return (REDIR_APPEND);
 }

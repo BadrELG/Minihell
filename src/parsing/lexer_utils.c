@@ -5,15 +5,16 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/19 00:00:00 by badr              #+#    #+#             */
-/*   Updated: 2025/12/19 16:18:42 by badr             ###   ########.fr       */
+/*   Created: 2025/12/13 18:39:04 by badr              #+#    #+#             */
+/*   Updated: 2026/01/08 16:14:04 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 
 /*
-** Vérifie si un caractère est un espace blanc (espace, tabulation ou retour à la ligne)
+** Vérifie si un caractère est un espace blanc
+** (espace, tabulation ou retour à la ligne)
 ** Retourne 1 si c'est un espace blanc, 0 sinon
 */
 int	is_whitespace(char c)
@@ -50,11 +51,42 @@ void	append_to_word(char **word, char *part)
 {
 	char	*tmp;
 
+	if (!part)
+		return ;
 	if (*word)
 	{
 		tmp = ft_strjoin(*word, part);
-		*word = tmp;
+		if (tmp)
+			*word = tmp;
 	}
 	else
 		*word = part;
+}
+
+/*
+** Extrait un opérateur (pipe ou redirection) et crée le token correspondant
+** Gère: | (pipe), < (input), > (output), >> (append), << (heredoc)
+** Détecte les opérateurs doubles (>> et <<) automatiquement
+** Retourne la position après l'opérateur
+*/
+int	get_operator(char *input, int i, t_token **tokens)
+{
+	int				len;
+	t_token_type	type;
+	char			*val;
+
+	len = 1;
+	if (input[i] == '|')
+		type = TOKEN_PIPE;
+	else if (input[i] == '>' && input[i + 1] == '>' && ++len)
+		type = TOKEN_APPEND;
+	else if (input[i] == '<' && input[i + 1] == '<' && ++len)
+		type = TOKEN_HEREDOC;
+	else if (input[i] == '<')
+		type = TOKEN_REDIR_IN;
+	else
+		type = TOKEN_REDIR_OUT;
+	val = ft_substr(input, i, len);
+	add_token(tokens, new_token(type, val));
+	return (i + len);
 }

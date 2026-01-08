@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/19 00:00:00 by badr              #+#    #+#             */
-/*   Updated: 2025/12/19 16:18:42 by badr             ###   ########.fr       */
+/*   Created: 2025/12/14 02:55:43 by badr              #+#    #+#             */
+/*   Updated: 2026/01/08 16:14:31 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,17 @@
 ** Détecte: pipe en début, pipes consécutifs, redirections sans fichier
 ** Retourne 1 si la syntaxe est correcte, 0 en cas d'erreur
 */
+static int	check_redir_syntax(t_token *tmp)
+{
+	if (!tmp->next || tmp->next->type != TOKEN_WORD)
+	{
+		if (!tmp->next)
+			return (syntax_error("newline"));
+		return (syntax_error(tmp->next->value));
+	}
+	return (1);
+}
+
 static int	check_syntax(t_token *tokens)
 {
 	t_token	*tmp;
@@ -26,16 +37,11 @@ static int	check_syntax(t_token *tokens)
 		return (syntax_error("|"));
 	while (tmp)
 	{
-		if (tmp->type == TOKEN_PIPE && (!tmp->next || tmp->next->type == TOKEN_PIPE))
-			return (syntax_error("|"));
-		if ((tmp->type == TOKEN_REDIR_IN || tmp->type == TOKEN_REDIR_OUT
-				|| tmp->type == TOKEN_APPEND)
-			&& (!tmp->next || tmp->next->type != TOKEN_WORD))
-		{
-			if (!tmp->next)
-				return (syntax_error("newline"));
-			return (syntax_error(tmp->next->value));
-		}
+		if (tmp->type == TOKEN_PIPE)
+			if (!tmp->next || tmp->next->type == TOKEN_PIPE)
+				return (syntax_error("|"));
+		if (is_redir_token(tmp->type) && !check_redir_syntax(tmp))
+			return (0);
 		tmp = tmp->next;
 	}
 	return (1);
@@ -44,27 +50,46 @@ static int	check_syntax(t_token *tokens)
 /*
 ** Traite un token de redirection et l'ajoute à la commande
 ** Extrait le type de redirection et le nom du fichier du token suivant
+** Pour heredoc: le delimiter n'est PAS expandé (sauf si entre quotes)
 ** Retourne le pointeur vers le token après le nom de fichier
 */
-static t_token	*parse_redirection(t_token *token, t_cmd *cmd)
+static t_token	*parse_redirection(t_token *token, t_cmd *cmd, t_shell *shell)
 {
 	t_redir_type	type;
+	char			*file;
+	t_redir			*redir;
 
 	type = token_to_redir_type(token->type);
+	file = NULL;
 	if (token->next && token->next->type == TOKEN_WORD)
 	{
-		add_redir(&cmd->redirs, new_redir(type, token->next->value));
+		if (type == REDIR_HEREDOC)
+		{
+			if (token->next->quoted && !token->next->no_expand)
+				file = expand_variables(token->next->value, shell);
+			else
+				file = token->next->value;
+		}
+		else if (token->next->no_expand)
+			file = token->next->value;
+		else
+			file = expand_variables(token->next->value, shell);
+		if (!file)
+			return (NULL);
+		redir = new_redir(type, file);
+		if (redir && type == REDIR_HEREDOC)
+			redir->expand = !token->next->quoted;
+		add_redir(&cmd->redirs, redir);
 		return (token->next->next);
 	}
 	return (token->next);
 }
 
 /*
-** Parse une commande complète (arguments + redirections) jusqu'au prochain pipe
-** Crée une structure t_cmd avec ses arguments et redirections
-** Ajoute la commande à la liste et retourne le token après la commande (pipe ou NULL)
+** Parse une commande complete jusqu au prochain pipe
+** Filtre les arguments vides qui ne viennent PAS de quotes (Bug 3)
 */
-static t_token	*parse_command(t_token *tokens, t_cmd **cmds)
+static t_token	*parse_command(t_token *tokens, t_cmd **cmds, t_shell *shell)
 {
 	t_cmd	*cmd;
 	int		i;
@@ -77,11 +102,12 @@ static t_token	*parse_command(t_token *tokens, t_cmd **cmds)
 	while (tokens && tokens->type != TOKEN_PIPE)
 	{
 		if (is_redir_token(tokens->type))
-			tokens = parse_redirection(tokens, cmd);
+			tokens = parse_redirection(tokens, cmd, shell);
 		else
 		{
 			if (tokens->type == TOKEN_WORD)
-				cmd->args[i++] = tokens->value;
+				if (tokens->value[0] || tokens->quoted)
+					cmd->args[i++] = tokens->value;
 			tokens = tokens->next;
 		}
 	}
@@ -96,7 +122,7 @@ static t_token	*parse_command(t_token *tokens, t_cmd **cmds)
 ** Vérifie d'abord la syntaxe puis parse chaque commande séparée par des pipes
 ** Retourne la liste de commandes ou NULL en cas d'erreur
 */
-t_cmd	*parser(t_token *tokens)
+t_cmd	*parser(t_token *tokens, t_shell *shell)
 {
 	t_cmd	*cmds;
 
@@ -107,7 +133,7 @@ t_cmd	*parser(t_token *tokens)
 		return (NULL);
 	while (tokens)
 	{
-		tokens = parse_command(tokens, &cmds);
+		tokens = parse_command(tokens, &cmds, shell);
 		if (tokens && tokens->type == TOKEN_PIPE)
 			tokens = tokens->next;
 	}

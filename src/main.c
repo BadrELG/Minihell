@@ -6,7 +6,7 @@
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/19 00:00:00 by badr              #+#    #+#             */
-/*   Updated: 2025/12/21 10:13:12 by badr             ###   ########.fr       */
+/*   Updated: 2026/01/07 18:13:14 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,45 +19,41 @@
 ** ==========================================================================
 */
 
-/*
-** Affiche le contenu d'une liste de commandes pour debug
-** Parcourt chaque cmd et affiche ses args entre crochets [arg1] [arg2]
-** Puis affiche les redirections avec leur type (<, >, >>)
-** Les pipes sont représentés par un | entre les commandes
-*/
+static void	print_redir(t_redir *r)
+{
+	while (r)
+	{
+		ft_printf("  -> ");
+		if (r->type == REDIR_IN)
+			ft_printf("< ");
+		else if (r->type == REDIR_OUT)
+			ft_printf("> ");
+		else if (r->type == REDIR_APPEND)
+			ft_printf(">> ");
+		else if (r->type == REDIR_HEREDOC)
+			ft_printf("<< ");
+		if (r->file)
+			ft_printf("%s", r->file);
+		ft_printf("\n");
+		r = r->next;
+	}
+}
+
 static void	print_debug(t_cmd *cmd)
 {
 	int		i;
-	t_redir	*r;
 
 	while (cmd)
 	{
-		ft_printf("CMD: ");
-		if (cmd->args)
+		ft_printf("CMD:");
+		i = 0;
+		while (cmd->args && cmd->args[i])
 		{
-			i = 0;
-			while (cmd->args[i])
-			{
-				ft_printf("[%s] ", cmd->args[i]);
-				i++;
-			}
+			ft_printf(" [%s]", cmd->args[i]);
+			i++;
 		}
 		ft_printf("\n");
-		r = cmd->redirs;
-		while (r)
-		{
-			ft_printf("  -> ");
-			if (r->type == REDIR_IN)
-				ft_printf("< ");
-			else if (r->type == REDIR_OUT)
-				ft_printf("> ");
-			else if (r->type == REDIR_APPEND)
-				ft_printf(">> ");
-			if (r->file)
-				ft_printf("%s", r->file);
-			ft_printf("\n");
-			r = r->next;
-		}
+		print_redir(cmd->redirs);
 		if (cmd->next)
 			ft_printf("  |\n");
 		cmd = cmd->next;
@@ -71,7 +67,7 @@ static void	print_debug(t_cmd *cmd)
 ** CTRL+D (input == NULL) quitte proprement
 ** Pour l'exec: remplace print_debug() par ta fonction d'exécution
 */
-static void	shell_loop(void)
+static void	shell_loop(t_shell *shell)
 {
 	char	*input;
 	t_token	*tokens;
@@ -88,10 +84,10 @@ static void	shell_loop(void)
 		if (*input)
 		{
 			add_history(input);
-			tokens = lexer(input);
+			tokens = lexer(input, shell);
 			if (tokens)
 			{
-				cmds = parser(tokens);
+				cmds = parser(tokens, shell);
 				if (cmds)
 					print_debug(cmds);
 			}
@@ -101,16 +97,19 @@ static void	shell_loop(void)
 }
 
 /*
-** Point d'entrée - pour l'instant on ignore argc/argv/envp
-** envp te servira pour récupérer les variables d'environnement
+** Point d'entrée - initialise le shell avec l'environnement
+** envp est copié dans shell.env pour pouvoir le modifier (export/unset)
 ** garbage_destroy() à la fin libère toute la mémoire allouée avec g_malloc
 */
 int	main(int argc, char **argv, char **envp)
 {
+	t_shell	shell;
+
 	(void)argc;
 	(void)argv;
-	(void)envp;
-	shell_loop();
+	shell.env = env_init(envp);
+	shell.last_exit_code = 0;
+	shell_loop(&shell);
 	garbage_destroy();
 	return (0);
 }

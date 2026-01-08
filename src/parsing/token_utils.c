@@ -6,7 +6,7 @@
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/19 00:00:00 by badr              #+#    #+#             */
-/*   Updated: 2025/12/19 16:18:42 by badr             ###   ########.fr       */
+/*   Updated: 2026/01/08 16:11:37 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ t_token	*new_token(t_token_type type, char *value)
 		return (NULL);
 	token->type = type;
 	token->value = value;
+	token->quoted = 0;
+	token->no_expand = 0;
 	token->next = NULL;
 	return (token);
 }

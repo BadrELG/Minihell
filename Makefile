@@ -30,7 +30,10 @@ SRCS		= $(SRC_DIR)/main.c \
 			  $(SRC_DIR)/parsing/token_utils.c \
 			  $(SRC_DIR)/parsing/parser.c \
 			  $(SRC_DIR)/parsing/parser_utils.c \
-			  $(SRC_DIR)/parsing/cmd_utils.c
+			  $(SRC_DIR)/parsing/cmd_utils.c \
+			  $(SRC_DIR)/parsing/expander.c \
+			  $(SRC_DIR)/parsing/expand_utils.c \
+			  $(SRC_DIR)/env/env.c
 
 OBJS		= $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.c=.o)))
 
