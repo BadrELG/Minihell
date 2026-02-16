@@ -12,21 +12,12 @@
 
 #include "../../include/minishell.h"
 
-/*
-** Vérifie si un type de token représente une redirection
-** Retourne 1 si c'est une redirection (IN, OUT ou APPEND), 0 sinon
-*/
 int	is_redir_token(t_token_type type)
 {
 	return (type == TOKEN_REDIR_IN || type == TOKEN_REDIR_OUT
 		|| type == TOKEN_APPEND || type == TOKEN_HEREDOC);
 }
 
-/*
-** Convertit un type de token en type de redirection correspondant
-** TOKEN_REDIR_IN -> REDIR_IN, TOKEN_REDIR_OUT -> REDIR_OUT
-** TOKEN_APPEND -> REDIR_APPEND, TOKEN_HEREDOC -> REDIR_HEREDOC
-*/
 t_redir_type	token_to_redir_type(t_token_type type)
 {
 	if (type == TOKEN_REDIR_IN)
@@ -39,11 +30,6 @@ t_redir_type	token_to_redir_type(t_token_type type)
 		return (REDIR_APPEND);
 }
 
-/*
-** Affiche un message d'erreur de syntaxe sur stderr
-** Format: "minishell: syntax error near unexpected token `<msg>'"
-** Retourne toujours 0 pour simplifier la gestion d'erreur
-*/
 int	syntax_error(char *msg)
 {
 	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
@@ -52,12 +38,6 @@ int	syntax_error(char *msg)
 	return (0);
 }
 
-/*
-** Compte le nombre d'arguments (tokens WORD) dans une commande
-** Ignore les redirections et leurs fichiers associés
-** S'arrête au pipe suivant ou à la fin de la liste
-** Utilisé pour allouer le tableau d'arguments de la commande
-*/
 int	count_args(t_token *tokens)
 {
 	int		count;

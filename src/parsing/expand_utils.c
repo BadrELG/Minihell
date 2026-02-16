@@ -12,12 +12,6 @@
 
 #include "../../include/minishell.h"
 
-/*
-** Extrait et copie le nom de variable depuis la chaîne
-** Gère les accolades: ${VAR} vs $VAR
-** Met à jour *len avec la longueur totale parsée (incluant les accolades)
-** Retourne le nom de la variable (sans les accolades) ou NULL si erreur
-*/
 char	*extract_var_name(char *str, int i, int in_braces, int *len)
 {
 	char	*name;
@@ -34,12 +28,6 @@ char	*extract_var_name(char *str, int i, int in_braces, int *len)
 	return (name);
 }
 
-/*
-** Ajoute un caractère à la fin d'une chaîne
-** Alloue une nouvelle chaîne avec le caractère ajouté
-** Utilisé pour construire le résultat caractère par caractère
-** Retourne la nouvelle chaîne ou NULL si erreur d'allocation
-*/
 char	*append_char(char *str, char c)
 {
 	char	*result;

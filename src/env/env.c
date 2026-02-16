@@ -12,11 +12,6 @@
 
 #include "../../include/minishell.h"
 
-/*
-** Compte le nombre de variables dans l'environnement
-** Parcourt le tableau envp jusqu'à NULL
-** Retourne le nombre de variables
-*/
 static int	env_count(char **envp)
 {
 	int	i;
@@ -27,11 +22,6 @@ static int	env_count(char **envp)
 	return (i);
 }
 
-/*
-** Cherche l'index d'une variable dans l'environnement
-** Compare le nom suivi de '=' pour matcher "NAME=value"
-** Retourne l'index si trouvé, -1 sinon
-*/
 static int	env_find_index(char **env, char *name)
 {
 	int	i;
@@ -50,12 +40,6 @@ static int	env_find_index(char **env, char *name)
 	return (-1);
 }
 
-/*
-** Initialise l'environnement du shell en copiant envp
-** Si envp est NULL ou vide, crée un environnement vide {NULL}
-** Utilise g_malloc pour la gestion mémoire via garbage collector
-** Retourne le tableau de variables ou NULL en cas d'échec
-*/
 char	**env_init(char **envp)
 {
 	char	**env;
@@ -87,12 +71,6 @@ char	**env_init(char **envp)
 	return (env);
 }
 
-/*
-** Récupère la valeur d'une variable d'environnement
-** Cherche "NAME=" et retourne le pointeur après le '='
-** Retourne NULL si la variable n'existe pas
-** Note: retourne un pointeur dans env, pas une copie
-*/
 char	*env_get(char **env, char *name)
 {
 	int	i;

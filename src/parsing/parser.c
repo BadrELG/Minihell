@@ -12,11 +12,6 @@
 
 #include "../../include/minishell.h"
 
-/*
-** Vérifie la validité syntaxique de la liste de tokens
-** Détecte: pipe en début, pipes consécutifs, redirections sans fichier
-** Retourne 1 si la syntaxe est correcte, 0 en cas d'erreur
-*/
 static int	check_redir_syntax(t_token *tmp)
 {
 	if (!tmp->next || tmp->next->type != TOKEN_WORD)
@@ -47,12 +42,6 @@ static int	check_syntax(t_token *tokens)
 	return (1);
 }
 
-/*
-** Traite un token de redirection et l'ajoute à la commande
-** Extrait le type de redirection et le nom du fichier du token suivant
-** Pour heredoc: le delimiter n'est PAS expandé (sauf si entre quotes)
-** Retourne le pointeur vers le token après le nom de fichier
-*/
 static t_token	*parse_redirection(t_token *token, t_cmd *cmd, t_shell *shell)
 {
 	t_redir_type	type;
@@ -85,10 +74,6 @@ static t_token	*parse_redirection(t_token *token, t_cmd *cmd, t_shell *shell)
 	return (token->next);
 }
 
-/*
-** Parse une commande complete jusqu au prochain pipe
-** Filtre les arguments vides qui ne viennent PAS de quotes (Bug 3)
-*/
 static t_token	*parse_command(t_token *tokens, t_cmd **cmds, t_shell *shell)
 {
 	t_cmd	*cmd;
@@ -116,12 +101,6 @@ static t_token	*parse_command(t_token *tokens, t_cmd **cmds, t_shell *shell)
 	return (tokens);
 }
 
-/*
-** Fonction principale de l'analyse syntaxique
-** Transforme une liste de tokens en liste chaînée de commandes exécutables
-** Vérifie d'abord la syntaxe puis parse chaque commande séparée par des pipes
-** Retourne la liste de commandes ou NULL en cas d'erreur
-*/
 t_cmd	*parser(t_token *tokens, t_shell *shell)
 {
 	t_cmd	*cmds;

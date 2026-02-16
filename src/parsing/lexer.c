@@ -12,13 +12,6 @@
 
 #include "../../include/minishell.h"
 
-/*
-** Gère le contenu entre quotes (simples ou doubles)
-** Single quotes: pas d'expansion, texte littéral
-** Double quotes: expansion des variables $VAR et $?
-** Met à jour lex->has_quotes et lex->only_single pour le suivi
-** Retourne la position après la quote fermante, ou -1 si erreur
-*/
 static int	handle_quotes(char *in, int i, char quote, t_lex *lex)
 {
 	int		start;
@@ -52,12 +45,6 @@ static int	handle_quotes(char *in, int i, char quote, t_lex *lex)
 	return (i + 1);
 }
 
-/*
-** Gère les caractères hors quotes (mots normaux)
-** Extrait le texte jusqu'au prochain espace, quote ou opérateur
-** Expande les variables si on n'est pas après une redirection
-** Retourne la nouvelle position, ou -1 si erreur d'allocation
-*/
 static int	handle_word_char(char *input, int i, t_lex *lex)
 {
 	int		start;
@@ -82,11 +69,6 @@ static int	handle_word_char(char *input, int i, t_lex *lex)
 	return (i);
 }
 
-/*
-** Définit les flags du token après sa création
-** quoted: indique si le token contenait des quotes
-** no_expand: vrai si SEULEMENT des single quotes (pas d'expansion au parser)
-*/
 static void	set_token_flags(t_token *token, t_lex *lex)
 {
 	if (token)
@@ -96,12 +78,6 @@ static void	set_token_flags(t_token *token, t_lex *lex)
 	}
 }
 
-/*
-** Construit un mot complet (peut contenir quotes et texte normal mélangés)
-** Exemple: hello"world"'test' -> helloworldtest
-** Crée un token WORD avec le résultat assemblé
-** Retourne la position après le mot, ou -1 si erreur
-*/
 static int	get_word(char *in, int i, t_token **tok, t_lex *lex)
 {
 	char	*word;
@@ -129,12 +105,6 @@ static int	get_word(char *in, int i, t_token **tok, t_lex *lex)
 	return (i);
 }
 
-/*
-** Fonction principale de l'analyse lexicale (tokenisation)
-** Transforme une chaîne d'entrée en liste chaînée de tokens
-** Les variables ($VAR, $?) sont expandées pendant le lexing
-** Retourne la liste de tokens ou NULL en cas d'erreur (ex: quote non fermée)
-*/
 t_token	*lexer(char *input, t_shell *shell)
 {
 	t_token	*tokens;

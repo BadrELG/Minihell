@@ -12,12 +12,6 @@
 
 #include "../../include/minishell.h"
 
-/*
-** Gère les variables positionnelles ($0, $1, etc.)
-** Ces variables ne sont pas supportées dans minishell, donc on les ignore
-** Calcule la longueur à sauter selon si on a des accolades ou non
-** Retourne une chaîne vide (la variable est ignorée)
-*/
 static char	*handle_digit_var(int *len, int in_braces, char *str)
 {
 	char	*name;
@@ -35,13 +29,6 @@ static char	*handle_digit_var(int *len, int in_braces, char *str)
 	return (name);
 }
 
-/*
-** Extrait le nom d'une variable à partir de la chaîne
-** Gère les formes: $VAR et ${VAR}
-** Le nom doit commencer par une lettre ou underscore
-** Retourne le nom de la variable et met à jour *len (longueur totale parsée)
-** Retourne NULL si la syntaxe n'est pas valide (ex: $@, $#)
-*/
 static char	*get_var_name(char *str, int *len)
 {
 	int		i;
@@ -62,11 +49,6 @@ static char	*get_var_name(char *str, int *len)
 	return (extract_var_name(str, i, in_braces, len));
 }
 
-/*
-** Expande $? vers le code de sortie de la dernière commande
-** Ajoute la valeur numérique au résultat en cours de construction
-** Retourne 2 (longueur de "$?") ou -1 en cas d'erreur
-*/
 static int	expand_exit_code(char **result, t_shell *shell)
 {
 	char	*code;
@@ -82,12 +64,6 @@ static int	expand_exit_code(char **result, t_shell *shell)
 	return (2);
 }
 
-/*
-** Expande une variable $VAR ou ${VAR} vers sa valeur
-** Si la variable n'existe pas, n'ajoute rien au résultat
-** Si le nom n'est pas valide, garde le '$' littéral
-** Retourne la longueur parsée (pour avancer dans la chaîne) ou -1 si erreur
-*/
 static int	expand_var(char *str, char **result, t_shell *shell)
 {
 	char	*name;
@@ -114,12 +90,6 @@ static int	expand_var(char *str, char **result, t_shell *shell)
 	return (len + 1);
 }
 
-/*
-** Fonction principale d'expansion des variables
-** Parcourt la chaîne et remplace $VAR par sa valeur, $? par l'exit code
-** Les caractères normaux sont copiés tels quels
-** Retourne la nouvelle chaîne avec les variables expandées, ou NULL si erreur
-*/
 char	*expand_variables(char *str, t_shell *shell)
 {
 	char	*result;

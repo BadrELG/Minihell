@@ -117,10 +117,6 @@ typedef struct s_lex
 	int					after_redir;
 }	t_lex;
 
-/*
-** Fonctions du lexer - transforme l'input en liste de tokens
-** C'est la première étape: "ls -la | grep" -> [WORD:ls][WORD:-la][PIPE][WORD:grep]
-*/
 t_token			*lexer(char *input, t_shell *shell);
 t_token			*new_token(t_token_type type, char *value);
 void			add_token(t_token **list, t_token *new);
@@ -128,10 +124,6 @@ int				skip_whitespace(char *input, int i);
 void			append_to_word(char **word, char *part);
 int				get_operator(char *input, int i, t_token **tokens);
 
-/*
-** Fonctions du parser - transforme les tokens en liste de commandes
-** C'est la deuxième étape: [WORD:ls][PIPE][WORD:grep] -> cmd1 -> cmd2
-*/
 t_cmd			*parser(t_token *tokens, t_shell *shell);
 t_cmd			*new_cmd(void);
 void			add_cmd(t_cmd **list, t_cmd *new);
@@ -142,21 +134,12 @@ int				count_args(t_token *tokens);
 t_redir_type	token_to_redir_type(t_token_type type);
 int				syntax_error(char *msg);
 
-/*
-** Utils - fonctions helper
-*/
 int				is_whitespace(char c);
 int				is_special_char(char c);
 
-/*
-** Env
-*/
 char			**env_init(char **envp);
 char			*env_get(char **env, char *name);
 
-/*
-** Expander
-*/
 char			*expand_variables(char *str, t_shell *shell);
 char			*append_char(char *str, char c);
 char			*extract_var_name(char *str, int i, int in_braces, int *len);
