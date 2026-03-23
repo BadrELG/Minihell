@@ -6,7 +6,7 @@
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/19 00:00:00 by badr              #+#    #+#             */
-/*   Updated: 2026/01/07 18:13:14 by badr             ###   ########.fr       */
+/*   Updated: 2026/03/23 18:20:16 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ typedef struct s_lex
 t_token			*lexer(char *input, t_shell *shell);
 t_token			*new_token(t_token_type type, char *value);
 void			add_token(t_token **list, t_token *new);
+void			set_token_flags(t_token *token, t_lex *lex);
 int				skip_whitespace(char *input, int i);
 void			append_to_word(char **word, char *part);
 int				get_operator(char *input, int i, t_token **tokens);
@@ -131,11 +132,13 @@ t_redir			*new_redir(t_redir_type type, char *file);
 void			add_redir(t_redir **list, t_redir *new);
 int				is_redir_token(t_token_type type);
 int				count_args(t_token *tokens);
+char    *get_redir_file(t_token *token, t_redir_type type, t_shell *shell);
 t_redir_type	token_to_redir_type(t_token_type type);
 int				syntax_error(char *msg);
 
 int				is_whitespace(char c);
 int				is_special_char(char c);
+int				handle_quotes(char *in, int i, char quote, t_lex *lex);
 
 char			**env_init(char **envp);
 char			*env_get(char **env, char *name);
@@ -143,5 +146,6 @@ char			*env_get(char **env, char *name);
 char			*expand_variables(char *str, t_shell *shell);
 char			*append_char(char *str, char c);
 char			*extract_var_name(char *str, int i, int in_braces, int *len);
+int				expand_exit_code(char **result, t_shell *shell);
 
 #endif

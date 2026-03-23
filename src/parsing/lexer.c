@@ -6,44 +6,11 @@
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/13 17:56:23 by badr              #+#    #+#             */
-/*   Updated: 2026/01/08 16:13:37 by badr             ###   ########.fr       */
+/*   Updated: 2026/03/23 18:20:16 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
-
-static int	handle_quotes(char *in, int i, char quote, t_lex *lex)
-{
-	int		start;
-	char	*quoted;
-
-	i++;
-	start = i;
-	while (in[i] && in[i] != quote)
-		i++;
-	if (!in[i])
-	{
-		ft_putstr_fd("minishell: syntax error: unclosed quote\n", 2);
-		return (-1);
-	}
-	quoted = g_malloc(i - start + 1);
-	if (!quoted)
-		return (-1);
-	ft_strlcpy(quoted, in + start, i - start + 1);
-	if (quote == '"')
-	{
-		lex->only_single = 0;
-		if (!lex->after_redir)
-		{
-			quoted = expand_variables(quoted, lex->shell);
-			if (!quoted)
-				return (-1);
-		}
-	}
-	append_to_word(lex->word, quoted);
-	lex->has_quotes = 1;
-	return (i + 1);
-}
 
 static int	handle_word_char(char *input, int i, t_lex *lex)
 {
@@ -67,15 +34,6 @@ static int	handle_word_char(char *input, int i, t_lex *lex)
 	}
 	append_to_word(lex->word, part);
 	return (i);
-}
-
-static void	set_token_flags(t_token *token, t_lex *lex)
-{
-	if (token)
-	{
-		token->quoted = lex->has_quotes;
-		token->no_expand = (lex->has_quotes && lex->only_single);
-	}
 }
 
 static int	get_word(char *in, int i, t_token **tok, t_lex *lex)
@@ -105,6 +63,22 @@ static int	get_word(char *in, int i, t_token **tok, t_lex *lex)
 	return (i);
 }
 
+static int	process_lexer_node(char *input, int i, t_token **tok, t_lex *lex)
+{
+	if (is_special_char(input[i]))
+	{
+		lex->after_redir = (input[i] == '<' || input[i] == '>');
+		i = get_operator(input, i, tok);
+	}
+	else
+	{
+		i = get_word(input, i, tok, lex);
+		if (i != -1)
+			lex->after_redir = 0;
+	}
+	return (i);
+}
+
 t_token	*lexer(char *input, t_shell *shell)
 {
 	t_token	*tokens;
@@ -122,18 +96,9 @@ t_token	*lexer(char *input, t_shell *shell)
 		i = skip_whitespace(input, i);
 		if (!input[i])
 			break ;
-		if (is_special_char(input[i]))
-		{
-			lex.after_redir = (input[i] == '<' || input[i] == '>');
-			i = get_operator(input, i, &tokens);
-		}
-		else
-		{
-			i = get_word(input, i, &tokens, &lex);
-			if (i == -1)
-				return (NULL);
-			lex.after_redir = 0;
-		}
+		i = process_lexer_node(input, i, &tokens, &lex);
+		if (i == -1)
+			return (NULL);
 	}
 	return (tokens);
 }

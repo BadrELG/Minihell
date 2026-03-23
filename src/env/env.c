@@ -40,6 +40,17 @@ static int	env_find_index(char **env, char *name)
 	return (-1);
 }
 
+static char	**create_empty_env(void)
+{
+	char	**env;
+
+	env = g_malloc(sizeof(char *) * 1);
+	if (!env)
+		return (NULL);
+	env[0] = NULL;
+	return (env);
+}
+
 char	**env_init(char **envp)
 {
 	char	**env;
@@ -47,13 +58,7 @@ char	**env_init(char **envp)
 	int		i;
 
 	if (!envp || !envp[0])
-	{
-		env = g_malloc(sizeof(char *) * 1);
-		if (!env)
-			return (NULL);
-		env[0] = NULL;
-		return (env);
-	}
+		return (create_empty_env());
 	count = env_count(envp);
 	env = g_malloc(sizeof(char *) * (count + 1));
 	if (!env)

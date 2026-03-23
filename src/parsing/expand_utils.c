@@ -6,7 +6,7 @@
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 00:00:00 by badr              #+#    #+#             */
-/*   Updated: 2025/12/21 00:00:00 by badr             ###   ########.fr       */
+/*   Updated: 2026/03/23 18:20:16 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,19 @@ char	*append_char(char *str, char c)
 	result[len] = c;
 	result[len + 1] = '\0';
 	return (result);
+}
+
+int	expand_exit_code(char **result, t_shell *shell)
+{
+	char	*code;
+	char	*tmp;
+
+	code = ft_itoa(shell->last_exit_code);
+	if (!code)
+		return (-1);
+	tmp = ft_strjoin(*result, code);
+	if (!tmp)
+		return (-1);
+	*result = tmp;
+	return (2);
 }

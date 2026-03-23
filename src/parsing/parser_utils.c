@@ -6,7 +6,7 @@
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/19 15:19:33 by badr              #+#    #+#             */
-/*   Updated: 2026/01/08 16:15:03 by badr             ###   ########.fr       */
+/*   Updated: 2026/03/23 18:20:16 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,4 +62,23 @@ int	count_args(t_token *tokens)
 		tmp = tmp->next;
 	}
 	return (count);
+}
+
+char	*get_redir_file(t_token *token, t_redir_type type, t_shell *shell)
+{
+	char	*file;
+
+	file = NULL;
+	if (type == REDIR_HEREDOC)
+	{
+		if (token->next->quoted && !token->next->no_expand)
+			file = expand_variables(token->next->value, shell);
+		else
+			file = token->next->value;
+	}
+	else if (token->next->no_expand)
+		file = token->next->value;
+	else
+		file = expand_variables(token->next->value, shell);
+	return (file);
 }

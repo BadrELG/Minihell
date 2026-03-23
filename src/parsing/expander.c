@@ -31,37 +31,28 @@ static char	*handle_digit_var(int *len, int in_braces, char *str)
 
 static char	*get_var_name(char *str, int *len)
 {
-	int		i;
-	int		in_braces;
+	int	i;
+	int	in_braces;
 
 	if (!str)
-		return (*len = 0, NULL);
+	{
+		*len = 0;
+		return (NULL);
+	}
 	in_braces = (str[0] == '{');
 	if (in_braces)
 		str++;
 	if (ft_isdigit(str[0]))
 		return (handle_digit_var(len, in_braces, str));
 	if (!(ft_isalpha(str[0]) || str[0] == '_'))
-		return (*len = 0, NULL);
+	{
+		*len = 0;
+		return (NULL);
+	}
 	i = 0;
 	while (str[i] && (ft_isalnum(str[i]) || str[i] == '_'))
 		i++;
 	return (extract_var_name(str, i, in_braces, len));
-}
-
-static int	expand_exit_code(char **result, t_shell *shell)
-{
-	char	*code;
-	char	*tmp;
-
-	code = ft_itoa(shell->last_exit_code);
-	if (!code)
-		return (-1);
-	tmp = ft_strjoin(*result, code);
-	if (!tmp)
-		return (-1);
-	*result = tmp;
-	return (2);
 }
 
 static int	expand_var(char *str, char **result, t_shell *shell)
@@ -90,6 +81,25 @@ static int	expand_var(char *str, char **result, t_shell *shell)
 	return (len + 1);
 }
 
+static int	handle_expand_char(char *str, char **result, t_shell *shell, int i)
+{
+	int	ret;
+
+	if (str[i] == '$' && str[i + 1] == '?')
+		ret = expand_exit_code(result, shell);
+	else if (str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_'
+			|| str[i + 1] == '{'))
+		ret = expand_var(str + i, result, shell);
+	else
+	{
+		*result = append_char(*result, str[i]);
+		if (!*result)
+			return (-1);
+		ret = 1;
+	}
+	return (ret);
+}
+
 char	*expand_variables(char *str, t_shell *shell)
 {
 	char	*result;
@@ -104,18 +114,7 @@ char	*expand_variables(char *str, t_shell *shell)
 	i = 0;
 	while (str[i])
 	{
-		if (str[i] == '$' && str[i + 1] == '?')
-			ret = expand_exit_code(&result, shell);
-		else if (str[i] == '$' && (ft_isalnum(str[i + 1]) || str[i + 1] == '_'
-				|| str[i + 1] == '{'))
-			ret = expand_var(str + i, &result, shell);
-		else
-		{
-			result = append_char(result, str[i]);
-			if (!result)
-				return (NULL);
-			ret = 1;
-		}
+		ret = handle_expand_char(str, &result, shell, i);
 		if (ret < 0)
 			return (NULL);
 		i += ret;

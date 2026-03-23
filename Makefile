@@ -6,7 +6,7 @@
 #    By: badr <badr@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/12/19 00:00:00 by badr              #+#    #+#              #
-#    Updated: 2025/12/19 14:33:15 by badr             ###   ########.fr        #
+#    Updated: 2026/03/23 18:20:16 by badr             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,6 +27,7 @@ OBJ_DIR		= obj
 SRCS		= $(SRC_DIR)/main.c \
 			  $(SRC_DIR)/parsing/lexer.c \
 			  $(SRC_DIR)/parsing/lexer_utils.c \
+			  $(SRC_DIR)/parsing/lexer_utils2.c \
 			  $(SRC_DIR)/parsing/token_utils.c \
 			  $(SRC_DIR)/parsing/parser.c \
 			  $(SRC_DIR)/parsing/parser_utils.c \

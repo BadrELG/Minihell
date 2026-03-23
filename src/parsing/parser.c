@@ -6,7 +6,7 @@
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/14 02:55:43 by badr              #+#    #+#             */
-/*   Updated: 2026/01/08 16:14:31 by badr             ###   ########.fr       */
+/*   Updated: 2026/03/23 18:20:16 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,20 +49,9 @@ static t_token	*parse_redirection(t_token *token, t_cmd *cmd, t_shell *shell)
 	t_redir			*redir;
 
 	type = token_to_redir_type(token->type);
-	file = NULL;
 	if (token->next && token->next->type == TOKEN_WORD)
 	{
-		if (type == REDIR_HEREDOC)
-		{
-			if (token->next->quoted && !token->next->no_expand)
-				file = expand_variables(token->next->value, shell);
-			else
-				file = token->next->value;
-		}
-		else if (token->next->no_expand)
-			file = token->next->value;
-		else
-			file = expand_variables(token->next->value, shell);
+		file = get_redir_file(token, type, shell);
 		if (!file)
 			return (NULL);
 		redir = new_redir(type, file);

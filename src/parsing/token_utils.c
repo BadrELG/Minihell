@@ -6,7 +6,7 @@
 /*   By: badr <badr@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/19 00:00:00 by badr              #+#    #+#             */
-/*   Updated: 2026/01/08 16:11:37 by badr             ###   ########.fr       */
+/*   Updated: 2026/03/23 18:20:47 by badr             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,13 @@ void	add_token(t_token **list, t_token *new)
 	while (tmp->next)
 		tmp = tmp->next;
 	tmp->next = new;
+}
+
+void	set_token_flags(t_token *token, t_lex *lex)
+{
+	if (token)
+	{
+		token->quoted = lex->has_quotes;
+		token->no_expand = (lex->has_quotes && lex->only_single);
+	}
 }
