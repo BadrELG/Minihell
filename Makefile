@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: badr <badr@student.42.fr>                  +#+  +:+       +#+         #
+#    By: sabrown <sabrown@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/12/19 00:00:00 by badr              #+#    #+#              #
-#    Updated: 2026/03/23 18:20:16 by badr             ###   ########.fr        #
+#    Updated: 2026/03/23 23:50:18 by sabrown          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		= minishell
 
 CC			= cc
-CFLAGS		= -Wall -Wextra -Werror
+CFLAGS		= -Wall -Wextra -Werror -ggdb
 LDFLAGS		= -lreadline
 
 LIBFT_DIR	= libft
@@ -34,7 +34,19 @@ SRCS		= $(SRC_DIR)/main.c \
 			  $(SRC_DIR)/parsing/cmd_utils.c \
 			  $(SRC_DIR)/parsing/expander.c \
 			  $(SRC_DIR)/parsing/expand_utils.c \
-			  $(SRC_DIR)/env/env.c
+			  $(SRC_DIR)/env/env.c \
+			  $(SRC_DIR)/exec/exec.c \
+			  $(SRC_DIR)/exec/exec1.c \
+			  $(SRC_DIR)/exec/exec2.c \
+			  $(SRC_DIR)/exec/exec3.c \
+			  $(SRC_DIR)/exec/exec4.c \
+			  $(SRC_DIR)/builtins/builtins.c \
+			  $(SRC_DIR)/builtins/builtins2.c \
+			  $(SRC_DIR)/builtins/builtins3.c \
+			  $(SRC_DIR)/builtins/builtins_utils.c \
+			  $(SRC_DIR)/builtins/builtins_utils2.c \
+			  $(SRC_DIR)/signals/signals.c \
+			  $(SRC_DIR)/heredoc.c
 
 OBJS		= $(addprefix $(OBJ_DIR)/, $(notdir $(SRCS:.c=.o)))
 
